@@ -1,100 +1,81 @@
 import React, { useState, useEffect } from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import {
-  StyleSheet,
-  ImageBackground,
-  Text,
-  View,
-  Button,
-  TextInput,
-  FlatList,
-  Pressable,
-  SafeAreaView,
-} from "react-native";
-import { StartGameScreen } from "./screens/StartGameScreen";
-import { GameScreen } from "./screens/GameScreen";
-import { colors } from "./constants/Color";
-import { GameOverScreen } from "./screens/GameOverScreen";
-import * as Font from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
-import {StatusBar} from 'expo-status-bar';
+import { StatusBar } from "expo-status-bar";
+import { Text, StyleSheet, Button } from "react-native";
+import { CategoriesScreen } from "./screens/CategoriesScreen";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { MealsOverviewScreeen } from "./screens/MealsOverviewScreen";
+import { MealDetailScreen } from "./screens/MealDetailScreen";
 
-//SplashScreen.preventAutoHideAsync();
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import { FavoriteScreen } from "./screens/FavoriteScreen";
+import { Ionicons } from '@expo/vector-icons';
 
+const Stack = createNativeStackNavigator();
+const Drawer = createDrawerNavigator();
+
+function DrawerNavigator() {
+  return (
+    <Drawer.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: '#351401' },
+        headerTintColor: 'white',
+        sceneContainerStyle: { backgroundColor: '#3f2f25' },
+        drawerContentStyle: { backgroundColor: '#351401' }, // mau nen draw
+        drawerInactiveTintColor: 'white', // mau chu trong draw
+        drawerActiveTintColor: '#351401', //
+        drawerActiveBackgroundColor: '#e4baa1', // mau vien khi chon
+      }}
+    >
+      <Drawer.Screen
+        name="Categories"
+        component={CategoriesScreen}
+        options={{
+          title: 'All Categories',
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="list" color={color} size={size} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Favorites"
+        component={FavoriteScreen}
+        options={{
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="star" color={color} size={size} />
+          ),
+        }}
+      />
+    </Drawer.Navigator>
+  );
+}
 export default function App() {
-  const [userNumber, setUserNumber] = useState();
-  const [gameIsOver, setGameIsOver]=useState(true)
-  const[guessRound, setGuessRound] = useState(0)
-
-  const [appIsReady, setAppIsReady] = useState(false);
-
-  useEffect(() => {
-    async function prepare() {
-      try {
-        await Font.loadAsync({
-          'open-sans': require('./assets/fonts/OpenSans-Regular.ttf'),
-          'open-sans-bold': require('./assets/fonts/OpenSans-Bold.ttf'),
-          '1': require('./assets/fonts/PoetsenOne-Regular.ttf')
-        });
-        // Other async tasks...
-        setAppIsReady(true); // Set app readiness state
-        SplashScreen.hideAsync(); // Hide splash screen
-      } catch (error) {
-        console.error('Error while preparing app:', error);
-      }
-    }
-    prepare();
-  }, []); // Empty dependency array means this effect runs only once on component mount
- 
-  function pickNumberHandler(pickNumber) {
-    setUserNumber(pickNumber);
-    setGameIsOver(false)
-  }
-  function gameOverHandler(numberOfRounds){
-    setGameIsOver(true)
-    setGuessRound(numberOfRounds)
-  }
-  function startNewGame(){
-    setUserNumber(null)
-    setGuessRound(0)
-
-  }
-
-  let screen = <StartGameScreen onPickNumber={pickNumberHandler} />;
-  if (userNumber) {
-    screen = <GameScreen userNumber={userNumber} onGameOver={gameOverHandler} />;
-  }
-  if(gameIsOver && userNumber ){
-    screen = <GameOverScreen roundsNum={guessRound} userNumber={userNumber} onStartNewGame={startNewGame} />;
-  }
-
   return (
     <>
-    <StatusBar style="light"/>
-    {/* // Cần cài gói linaer */}
-    <LinearGradient colors={[colors.primary700, colors.accent500]} style={styles.rootScreen}>
-      <ImageBackground
-        source={require("./assets/images/dice.jpg")}
-        resizeMode="cover"
-        style={styles.rootScreen}
-        imageStyle={styles.backgroundImage}
-      >
-        {/* <SafeAreaView style={styles.rootScreen}> {screen}</SafeAreaView> */}
-        {/* tim hieu safeArea la gi */}
-        <SafeAreaView style={styles.rootScreen}>
-         {screen}
-        </SafeAreaView>
-      </ImageBackground>
-    </LinearGradient>
+      <StatusBar style="light" />
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            // chinh mau nen, de chung no se an tat ca cac trang
+            headerStyle: { backgroundColor: "#351401" },
+            headerTintColor: "white",
+            contentStyle: { backgroundColor: "#3f2f25" },
+          }}
+        >
+          {/* trinh ho tro stack */}
+          <Stack.Screen
+            name="Drawer"
+            // component={CategoriesScreen}
+            component={DrawerNavigator}
+            options={{ title: "All Categories" , headerShown:false}}
+          />
+          <Stack.Screen
+            name="MealsOverview"
+            component={MealsOverviewScreeen}
+          />
+          <Stack.Screen name="MealDetail" component={MealDetailScreen} options={{title:"helo"}} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </>
   );
 }
-const styles = StyleSheet.create({
-  // View chi style so vơi nọi dung cua no dang chua chu khong style het mac du boc no o ngoai
-  rootScreen: {
-    flex: 1,
-  },
-  backgroundImage: {
-    opacity: 0.15,
-  },
-});
