@@ -7,7 +7,7 @@ import {
   Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import MealDetail from "./MealDetail"
+import MealDetail from "../MealDetail";
 // vi ko phai la mot screen nen khong vo route hay navigation, nen phai import
 export function MealItem({
   id,
@@ -36,7 +36,11 @@ export function MealItem({
             <Image source={{ uri: imageUrl }} style={styles.image} />
             <Text style={styles.title}>{title}</Text>
           </View>
-       <MealDetail duration={duration} complexity={complexity} affordability={affordability} />
+          <MealDetail
+            duration={duration}
+            complexity={complexity}
+            affordability={affordability}
+          />
         </View>
       </Pressable>
     </View>
